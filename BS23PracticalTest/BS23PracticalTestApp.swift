@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct BS23PracticalTestApp: App {
+    @StateObject private var vm = MoviesViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                MoviesView()
+                    .environmentObject(vm)
+            }
         }
     }
 }
