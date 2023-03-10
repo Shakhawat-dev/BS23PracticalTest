@@ -57,7 +57,7 @@ struct MoviesView: View {
                     }
                     .overlay(alignment: .bottom) {
                         if vm.showLoader {
-                            Text("Loading...")
+                            ProgressView()
                         }
                     }
                 } else {
