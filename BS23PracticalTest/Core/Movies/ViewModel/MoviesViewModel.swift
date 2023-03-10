@@ -19,6 +19,10 @@ class MoviesViewModel: ObservableObject {
     
     @Published var searchText: String = ""
     @Published var page: Int = 1
+    @Published var showLoader: Bool = false
+    
+//    @Published var scrollViewOffset: CGFloat = 0
+    @Published var showTop: Bool = false
     
     init() {
         addSubscribers()
@@ -29,6 +33,8 @@ class MoviesViewModel: ObservableObject {
             .sink { [weak self] (returnedMovies) in
                 self?.movieResponse = returnedMovies
                 self?.movieList.append(contentsOf: self?.movieResponse?.results ?? [])
+                self?.showLoader = false
+//                print(self?.movieList)
             }
             .store(in: &cancellables)
         
@@ -47,6 +53,7 @@ class MoviesViewModel: ObservableObject {
         $page
             .sink { [weak self] (page) in
                 self?.movieDbService.getMovies(query: self?.searchText ?? "", page: page)
+                self?.showLoader = true
             }
             .store(in: &cancellables)
 

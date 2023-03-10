@@ -12,22 +12,59 @@ struct MoviesView: View {
     
     var body: some View {
         ZStack {
-            if let movies = vm.movieList {
-                List(movies, id: \.id) { movie in
-                    MovieRowView(movie: movie)
-                        .onAppear() {
-                            DispatchQueue.global().sync {
-                                // For infinite scroll
-                                if movie.id == movies.last?.id {
-                                    vm.goNext()
+            ScrollViewReader { proxy in
+                if let movies = vm.movieList {
+                    VStack {
+                        List(movies, id: \.id) { movie in
+                            MovieRowView(movie: movie)
+                                .id(movie.id)
+                                .onAppear() {
+                                    DispatchQueue.global().sync {
+                                        // For infinite scroll
+                                        if movie.id == movies.last?.id {
+                                            vm.goNext()
+                                            
+                                            withAnimation {
+                                                vm.showTop = true
+                                            }
+                                        }
+                                    }
                                 }
-                            }
                         }
+                        .listStyle(PlainListStyle())
+                        .overlay(alignment: Alignment.bottomTrailing) {
+                            if vm.showTop {
+                                Button {
+                                    withAnimation {
+                                        proxy.scrollTo(movies.first?.id)
+                                        vm.showTop = false
+                                        vm.showLoader = false
+                                    }
+                                } label: {
+                                    Image(systemName: "arrow.up")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background {
+                                            Circle()
+                                        }
+                                }
+                                .padding(.all)
+                            }
+                            
+                        }
+                        
+                        
+                    }
+                    .overlay(alignment: .bottom) {
+                        if vm.showLoader {
+                            Text("Loading...")
+                        }
+                    }
+                } else {
+                    NoDataView()
                 }
-                .listStyle(PlainListStyle())
-            } else {
-                NoDataView()
             }
+            
             
             if vm.movieList.isEmpty {
                 NoDataView()
